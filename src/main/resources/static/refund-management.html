@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refund Management - Golden Palm Resort</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .status-badge {
+            font-size: 0.8em;
+            padding: 0.4em 0.8em;
+        }
+        .refund-card {
+            transition: transform 0.2s;
+        }
+        .refund-card:hover {
+            transform: translateY(-2px);
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .filter-section {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .btn-sm {
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-hotel me-2"></i>Golden Palm Resort
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="admin.html">Admin Dashboard</a>
+                <a class="nav-link" href="login.html">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h2><i class="fas fa-undo me-2"></i>Refund Management</h2>
+                <p class="text-muted">Manage refund requests and process refunds</p>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-2">
+                <div class="card stats-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title" id="pendingCount">0</h5>
+                        <p class="card-text">Pending</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card stats-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title" id="approvedCount">0</h5>
+                        <p class="card-text">Approved</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card stats-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title" id="completedCount">0</h5>
+                        <p class="card-text">Completed</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card stats-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title" id="rejectedCount">0</h5>
+                        <p class="card-text">Rejected</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card stats-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title" id="cancelledCount">0</h5>
+                        <p class="card-text">Cancelled</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card stats-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title" id="totalAmount">$0</h5>
+                        <p class="card-text">Total Amount</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-section">
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="statusFilter" class="form-label">Status</label>
+                    <select class="form-select" id="statusFilter">
+                        <option value="">All Statuses</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="APPROVED">Approved</option>
+                        <option value="PROCESSING">Processing</option>
+                        <option value="COMPLETED">Completed</option>
+                        <option value="REJECTED">Rejected</option>
+                        <option value="CANCELLED">Cancelled</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="typeFilter" class="form-label">Refund Type</label>
+                    <select class="form-select" id="typeFilter">
+                        <option value="">All Types</option>
+                        <option value="FULL_REFUND">Full Refund</option>
+                        <option value="PARTIAL_REFUND">Partial Refund</option>
+                        <option value="CANCELLATION_REFUND">Cancellation Refund</option>
+                        <option value="NO_SHOW_REFUND">No Show Refund</option>
+                        <option value="SERVICE_ISSUE_REFUND">Service Issue Refund</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="dateFrom" class="form-label">From Date</label>
+                    <input type="date" class="form-control" id="dateFrom">
+                </div>
+                <div class="col-md-3">
+                    <label for="dateTo" class="form-label">To Date</label>
+                    <input type="date" class="form-control" id="dateTo">
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <button class="btn btn-primary" onclick="applyFilters()">
+                        <i class="fas fa-filter me-1"></i>Apply Filters
+                    </button>
+                    <button class="btn btn-outline-secondary ms-2" onclick="clearFilters()">
+                        <i class="fas fa-times me-1"></i>Clear
+                    </button>
+                </div>
+                <div class="col-md-6 text-end">
+                    <button class="btn btn-success" onclick="showCreateRefundModal()">
+                        <i class="fas fa-plus me-1"></i>Create Refund
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Refunds Table -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Refund Requests</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Refund ID</th>
+                                <th>Payment ID</th>
+                                <th>Booking Reference</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Requested Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="refundsTableBody">
+                            <!-- Refunds will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Refund Modal -->
+    <div class="modal fade" id="createRefundModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Refund Request</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createRefundForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="paymentId" class="form-label">Payment ID *</label>
+                                <input type="number" class="form-control" id="paymentId" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="refundAmount" class="form-label">Refund Amount *</label>
+                                <input type="number" class="form-control" id="refundAmount" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label for="refundType" class="form-label">Refund Type *</label>
+                                <select class="form-select" id="refundType" required>
+                                    <option value="">Select Type</option>
+                                    <option value="FULL_REFUND">Full Refund</option>
+                                    <option value="PARTIAL_REFUND">Partial Refund</option>
+                                    <option value="CANCELLATION_REFUND">Cancellation Refund</option>
+                                    <option value="NO_SHOW_REFUND">No Show Refund</option>
+                                    <option value="SERVICE_ISSUE_REFUND">Service Issue Refund</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="refundMethod" class="form-label">Refund Method</label>
+                                <select class="form-select" id="refundMethod">
+                                    <option value="">Select Method</option>
+                                    <option value="ORIGINAL_PAYMENT_METHOD">Original Payment Method</option>
+                                    <option value="BANK_TRANSFER">Bank Transfer</option>
+                                    <option value="CASH">Cash</option>
+                                    <option value="CHECK">Check</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <label for="refundReason" class="form-label">Refund Reason *</label>
+                            <textarea class="form-control" id="refundReason" rows="3" required></textarea>
+                        </div>
+                        <div class="mt-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" rows="2"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="createRefund()">Create Refund</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Refund Details Modal -->
+    <div class="modal fade" id="refundDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Refund Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="refundDetailsContent">
+                    <!-- Refund details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Modal -->
+    <div class="modal fade" id="actionModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="actionModalTitle">Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="actionForm">
+                        <div class="mb-3">
+                            <label for="adminNotes" class="form-label">Admin Notes</label>
+                            <textarea class="form-control" id="adminNotes" rows="3"></textarea>
+                        </div>
+                        <div id="additionalFields"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmActionBtn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentRefundId = null;
+        let currentAction = null;
+
+        // Load refunds on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRefunds();
+            loadStats();
+        });
+
+        async function loadRefunds() {
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/refunds', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const refunds = await response.json();
+                    displayRefunds(refunds);
+                } else {
+                    console.error('Failed to load refunds');
+                }
+            } catch (error) {
+                console.error('Error loading refunds:', error);
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/refunds/stats', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const stats = await response.json();
+                    document.getElementById('pendingCount').textContent = stats.pendingCount || 0;
+                    document.getElementById('approvedCount').textContent = stats.approvedCount || 0;
+                    document.getElementById('completedCount').textContent = stats.completedCount || 0;
+                    document.getElementById('rejectedCount').textContent = stats.rejectedCount || 0;
+                    document.getElementById('cancelledCount').textContent = stats.cancelledCount || 0;
+                    
+                    const totalAmount = (parseFloat(stats.pendingAmount || 0) + 
+                                       parseFloat(stats.approvedAmount || 0) + 
+                                       parseFloat(stats.completedAmount || 0)).toFixed(2);
+                    document.getElementById('totalAmount').textContent = `$${totalAmount}`;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        function displayRefunds(refunds) {
+            const tbody = document.getElementById('refundsTableBody');
+            tbody.innerHTML = '';
+
+            refunds.forEach(refund => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${refund.refundReference}</td>
+                    <td>${refund.paymentId}</td>
+                    <td>${refund.bookingReference || refund.eventBookingReference || 'N/A'}</td>
+                    <td>${refund.customerName || 'N/A'}</td>
+                    <td>$${refund.refundAmount}</td>
+                    <td>${refund.refundType.replace('_', ' ')}</td>
+                    <td><span class="badge status-badge ${getStatusClass(refund.refundStatus)}">${refund.refundStatus}</span></td>
+                    <td>${new Date(refund.requestedDate).toLocaleDateString()}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-sm btn-outline-info" onclick="viewRefundDetails(${refund.id})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${getActionButtons(refund)}
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function getStatusClass(status) {
+            const statusClasses = {
+                'PENDING': 'bg-warning',
+                'APPROVED': 'bg-info',
+                'PROCESSING': 'bg-primary',
+                'COMPLETED': 'bg-success',
+                'REJECTED': 'bg-danger',
+                'CANCELLED': 'bg-secondary'
+            };
+            return statusClasses[status] || 'bg-secondary';
+        }
+
+        function getActionButtons(refund) {
+            let buttons = '';
+            
+            if (refund.refundStatus === 'PENDING') {
+                buttons += `
+                    <button class="btn btn-sm btn-success" onclick="showActionModal(${refund.id}, 'approve')">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="showActionModal(${refund.id}, 'reject')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+            } else if (refund.refundStatus === 'APPROVED') {
+                buttons += `
+                    <button class="btn btn-sm btn-primary" onclick="showActionModal(${refund.id}, 'process')">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                `;
+            } else if (refund.refundStatus === 'PROCESSING') {
+                buttons += `
+                    <button class="btn btn-sm btn-success" onclick="showActionModal(${refund.id}, 'complete')">
+                        <i class="fas fa-check-circle"></i>
+                    </button>
+                `;
+            }
+            
+            if (refund.refundStatus !== 'COMPLETED' && refund.refundStatus !== 'CANCELLED') {
+                buttons += `
+                    <button class="btn btn-sm btn-warning" onclick="cancelRefund(${refund.id})">
+                        <i class="fas fa-ban"></i>
+                    </button>
+                `;
+            }
+            
+            return buttons;
+        }
+
+        function showCreateRefundModal() {
+            const modal = new bootstrap.Modal(document.getElementById('createRefundModal'));
+            modal.show();
+        }
+
+        async function createRefund() {
+            const formData = {
+                paymentId: parseInt(document.getElementById('paymentId').value),
+                refundAmount: parseFloat(document.getElementById('refundAmount').value),
+                refundType: document.getElementById('refundType').value,
+                refundReason: document.getElementById('refundReason').value,
+                refundMethod: document.getElementById('refundMethod').value,
+                notes: document.getElementById('notes').value
+            };
+
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/refunds', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    alert('Refund request created successfully');
+                    bootstrap.Modal.getInstance(document.getElementById('createRefundModal')).hide();
+                    document.getElementById('createRefundForm').reset();
+                    loadRefunds();
+                    loadStats();
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + error.error);
+                }
+            } catch (error) {
+                console.error('Error creating refund:', error);
+                alert('Error creating refund request');
+            }
+        }
+
+        async function viewRefundDetails(refundId) {
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch(`/api/refunds/${refundId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const refund = await response.json();
+                    displayRefundDetails(refund);
+                    const modal = new bootstrap.Modal(document.getElementById('refundDetailsModal'));
+                    modal.show();
+                } else {
+                    alert('Error loading refund details');
+                }
+            } catch (error) {
+                console.error('Error loading refund details:', error);
+                alert('Error loading refund details');
+            }
+        }
+
+        function displayRefundDetails(refund) {
+            const content = document.getElementById('refundDetailsContent');
+            content.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Refund Information</h6>
+                        <p><strong>Refund ID:</strong> ${refund.refundReference}</p>
+                        <p><strong>Amount:</strong> $${refund.refundAmount}</p>
+                        <p><strong>Type:</strong> ${refund.refundType.replace('_', ' ')}</p>
+                        <p><strong>Status:</strong> <span class="badge ${getStatusClass(refund.refundStatus)}">${refund.refundStatus}</span></p>
+                        <p><strong>Reason:</strong> ${refund.refundReason}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Payment Information</h6>
+                        <p><strong>Payment ID:</strong> ${refund.paymentId}</p>
+                        <p><strong>Original Amount:</strong> $${refund.originalPaymentAmount}</p>
+                        <p><strong>Payment Method:</strong> ${refund.paymentMethod}</p>
+                        <p><strong>Transaction ID:</strong> ${refund.paymentTransactionId || 'N/A'}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <h6>Customer Information</h6>
+                        <p><strong>Name:</strong> ${refund.customerName || 'N/A'}</p>
+                        <p><strong>Email:</strong> ${refund.customerEmail || 'N/A'}</p>
+                        <p><strong>Booking Reference:</strong> ${refund.bookingReference || refund.eventBookingReference || 'N/A'}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Timeline</h6>
+                        <p><strong>Requested:</strong> ${new Date(refund.requestedDate).toLocaleString()}</p>
+                        <p><strong>Processed:</strong> ${refund.processedDate ? new Date(refund.processedDate).toLocaleString() : 'N/A'}</p>
+                        <p><strong>Approved:</strong> ${refund.approvedDate ? new Date(refund.approvedDate).toLocaleString() : 'N/A'}</p>
+                        <p><strong>Refunded:</strong> ${refund.refundDate ? new Date(refund.refundDate).toLocaleString() : 'N/A'}</p>
+                    </div>
+                </div>
+                ${refund.adminNotes ? `<div class="mt-3"><h6>Admin Notes</h6><p>${refund.adminNotes}</p></div>` : ''}
+                ${refund.notes ? `<div class="mt-3"><h6>Notes</h6><p>${refund.notes}</p></div>` : ''}
+            `;
+        }
+
+        function showActionModal(refundId, action) {
+            currentRefundId = refundId;
+            currentAction = action;
+            
+            const modal = document.getElementById('actionModal');
+            const title = document.getElementById('actionModalTitle');
+            const additionalFields = document.getElementById('additionalFields');
+            
+            title.textContent = action.charAt(0).toUpperCase() + action.slice(1) + ' Refund';
+            
+            // Clear additional fields
+            additionalFields.innerHTML = '';
+            
+            // Add specific fields based on action
+            if (action === 'process') {
+                additionalFields.innerHTML = `
+                    <div class="mb-3">
+                        <label for="refundMethod" class="form-label">Refund Method</label>
+                        <select class="form-select" id="refundMethod">
+                            <option value="ORIGINAL_PAYMENT_METHOD">Original Payment Method</option>
+                            <option value="BANK_TRANSFER">Bank Transfer</option>
+                            <option value="CASH">Cash</option>
+                            <option value="CHECK">Check</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="refundTransactionId" class="form-label">Transaction ID</label>
+                        <input type="text" class="form-control" id="refundTransactionId">
+                    </div>
+                `;
+            }
+            
+            const bootstrapModal = new bootstrap.Modal(modal);
+            bootstrapModal.show();
+        }
+
+        async function performAction() {
+            const adminNotes = document.getElementById('adminNotes').value;
+            let requestData = { adminNotes };
+            
+            if (currentAction === 'process') {
+                requestData.refundMethod = document.getElementById('refundMethod').value;
+                requestData.refundTransactionId = document.getElementById('refundTransactionId').value;
+            }
+            
+            try {
+                const token = localStorage.getItem('authToken');
+                let endpoint = '';
+                
+                switch (currentAction) {
+                    case 'approve':
+                        endpoint = `/api/refunds/${currentRefundId}/approve`;
+                        break;
+                    case 'reject':
+                        endpoint = `/api/refunds/${currentRefundId}/reject`;
+                        break;
+                    case 'process':
+                        endpoint = `/api/refunds/${currentRefundId}/process`;
+                        break;
+                    case 'complete':
+                        endpoint = `/api/refunds/${currentRefundId}/complete`;
+                        break;
+                }
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                if (response.ok) {
+                    alert(`Refund ${currentAction}d successfully`);
+                    bootstrap.Modal.getInstance(document.getElementById('actionModal')).hide();
+                    loadRefunds();
+                    loadStats();
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + error.error);
+                }
+            } catch (error) {
+                console.error(`Error ${currentAction}ing refund:`, error);
+                alert(`Error ${currentAction}ing refund`);
+            }
+        }
+
+        async function cancelRefund(refundId) {
+            if (confirm('Are you sure you want to cancel this refund?')) {
+                try {
+                    const token = localStorage.getItem('authToken');
+                    const response = await fetch(`/api/refunds/${refundId}/cancel`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        alert('Refund cancelled successfully');
+                        loadRefunds();
+                        loadStats();
+                    } else {
+                        const error = await response.json();
+                        alert('Error: ' + error.error);
+                    }
+                } catch (error) {
+                    console.error('Error cancelling refund:', error);
+                    alert('Error cancelling refund');
+                }
+            }
+        }
+
+        function applyFilters() {
+            // Implementation for filtering refunds
+            loadRefunds();
+        }
+
+        function clearFilters() {
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('dateFrom').value = '';
+            document.getElementById('dateTo').value = '';
+            loadRefunds();
+        }
+
+        // Set up confirm action button
+        document.getElementById('confirmActionBtn').addEventListener('click', performAction);
+    </script>
+</body>
+</html>
+

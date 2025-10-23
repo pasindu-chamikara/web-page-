@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refund Workflow Demo - Golden Palm Resort</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .demo-section {
+            margin: 30px 0;
+            padding: 30px;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            background: #f8f9fa;
+        }
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .step-number {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #007bff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+        .step-content {
+            flex: 1;
+        }
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-approved { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+        .status-completed { background: #d1ecf1; color: #0c5460; }
+        .demo-button {
+            margin: 10px 5px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center py-5 bg-primary text-white">
+                    <h1><i class="fas fa-undo me-3"></i>Refund Workflow Demo</h1>
+                    <p class="lead">Complete Customer to Admin Refund Process</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="container my-5">
+            <!-- Customer Workflow -->
+            <div class="demo-section">
+                <h2><i class="fas fa-user me-2"></i>Customer Workflow</h2>
+                <p class="text-muted">How customers request refunds</p>
+                
+                <div class="workflow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h5>Customer Login</h5>
+                        <p>Customer logs into the system and navigates to refund request</p>
+                        <button class="btn btn-primary demo-button" onclick="openCustomerRefund()">
+                            <i class="fas fa-external-link-alt me-1"></i>Open Customer Refund Page
+                        </button>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h5>Find Payment</h5>
+                        <p>Customer searches for their payment using Payment ID or Booking Reference</p>
+                        <div class="alert alert-info">
+                            <strong>Demo:</strong> Try searching with Payment ID: <code>12345</code> or Booking Reference: <code>BOOK001</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h5>Submit Refund Request</h5>
+                        <p>Customer fills out refund details and submits request</p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Required Information:</h6>
+                                <ul>
+                                    <li>Refund Amount</li>
+                                    <li>Refund Type (Full/Partial/Cancellation)</li>
+                                    <li>Reason for Refund</li>
+                                    <li>Refund Method Preference</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Optional Information:</h6>
+                                <ul>
+                                    <li>Additional Notes</li>
+                                    <li>Special Instructions</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h5>Request Submitted</h5>
+                        <p>Customer receives confirmation and tracking information</p>
+                        <span class="status-badge status-pending">PENDING</span>
+                        <p class="mt-2 text-muted">Status: Waiting for admin approval</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Workflow -->
+            <div class="demo-section">
+                <h2><i class="fas fa-user-shield me-2"></i>Admin Workflow</h2>
+                <p class="text-muted">How admins manage refund requests</p>
+                
+                <div class="workflow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h5>Admin Login</h5>
+                        <p>Admin logs into the system and accesses refund management</p>
+                        <button class="btn btn-success demo-button" onclick="openAdminRefund()">
+                            <i class="fas fa-external-link-alt me-1"></i>Open Admin Refund Management
+                        </button>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h5>Review Refund Requests</h5>
+                        <p>Admin sees all pending refund requests with details</p>
+                        <div class="alert alert-warning">
+                            <strong>Admin View:</strong> All refund requests are listed with customer details, payment information, and reasons
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h5>Approve or Reject</h5>
+                        <p>Admin can approve or reject refund requests</p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button class="btn btn-success demo-button" onclick="simulateApprove()">
+                                    <i class="fas fa-check me-1"></i>Approve Refund
+                                </button>
+                                <p class="text-success mt-2">✅ Refund approved for processing</p>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-danger demo-button" onclick="simulateReject()">
+                                    <i class="fas fa-times me-1"></i>Reject Refund
+                                </button>
+                                <p class="text-danger mt-2">❌ Refund rejected with reason</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h5>Process Refund</h5>
+                        <p>For approved refunds, admin processes the actual refund</p>
+                        <button class="btn btn-primary demo-button" onclick="simulateProcess()">
+                            <i class="fas fa-cog me-1"></i>Process Refund
+                        </button>
+                        <span class="status-badge status-approved ms-3">APPROVED</span>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h5>Complete Refund</h5>
+                        <p>Admin marks refund as completed after processing</p>
+                        <button class="btn btn-success demo-button" onclick="simulateComplete()">
+                            <i class="fas fa-check-circle me-1"></i>Complete Refund
+                        </button>
+                        <span class="status-badge status-completed ms-3">COMPLETED</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Tracking -->
+            <div class="demo-section">
+                <h2><i class="fas fa-chart-line me-2"></i>Refund Status Tracking</h2>
+                <p class="text-muted">Complete refund lifecycle</p>
+                
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <div class="status-badge status-pending mx-auto mb-3">PENDING</div>
+                                <h6>Request Submitted</h6>
+                                <p class="text-muted">Customer submits refund request</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <div class="status-badge status-approved mx-auto mb-3">APPROVED</div>
+                                <h6>Admin Approved</h6>
+                                <p class="text-muted">Admin approves the refund</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <div class="status-badge status-approved mx-auto mb-3">PROCESSING</div>
+                                <h6>Being Processed</h6>
+                                <p class="text-muted">Refund is being processed</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <div class="status-badge status-completed mx-auto mb-3">COMPLETED</div>
+                                <h6>Refund Complete</h6>
+                                <p class="text-muted">Refund has been completed</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Testing -->
+            <div class="demo-section">
+                <h2><i class="fas fa-code me-2"></i>API Testing</h2>
+                <p class="text-muted">Test the refund APIs directly</p>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Get All Refunds</h5>
+                        <button class="btn btn-info demo-button" onclick="testGetRefunds()">
+                            <i class="fas fa-list me-1"></i>Get All Refunds
+                        </button>
+                        <div id="refundsResult" class="mt-3"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Create Test Refund</h5>
+                        <button class="btn btn-warning demo-button" onclick="testCreateRefund()">
+                            <i class="fas fa-plus me-1"></i>Create Test Refund
+                        </button>
+                        <div id="createResult" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Access -->
+            <div class="demo-section">
+                <h2><i class="fas fa-rocket me-2"></i>Quick Access</h2>
+                <p class="text-muted">Direct links to all refund system components</p>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-user fa-3x text-primary mb-3"></i>
+                                <h5>Customer Interface</h5>
+                                <p class="text-muted">Request refunds</p>
+                                <button class="btn btn-primary" onclick="openCustomerRefund()">
+                                    Open Refund Request
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-user-shield fa-3x text-success mb-3"></i>
+                                <h5>Admin Interface</h5>
+                                <p class="text-muted">Manage refunds</p>
+                                <button class="btn btn-success" onclick="openAdminRefund()">
+                                    Open Refund Management
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-database fa-3x text-info mb-3"></i>
+                                <h5>Database Console</h5>
+                                <p class="text-muted">View database</p>
+                                <button class="btn btn-info" onclick="openDatabase()">
+                                    Open H2 Console
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function openCustomerRefund() {
+            window.open('http://localhost:8080/refund-request.html', '_blank');
+        }
+
+        function openAdminRefund() {
+            window.open('http://localhost:8080/refund-management.html', '_blank');
+        }
+
+        function openDatabase() {
+            window.open('http://localhost:8080/h2-console', '_blank');
+        }
+
+        function simulateApprove() {
+            alert('✅ Refund Approved!\n\nAdmin has approved the refund request. The refund will now be processed.');
+        }
+
+        function simulateReject() {
+            alert('❌ Refund Rejected!\n\nAdmin has rejected the refund request with a reason. Customer will be notified.');
+        }
+
+        function simulateProcess() {
+            alert('⚙️ Refund Processing!\n\nRefund is being processed. Payment will be initiated.');
+        }
+
+        function simulateComplete() {
+            alert('✅ Refund Completed!\n\nRefund has been successfully processed and completed.');
+        }
+
+        async function testGetRefunds() {
+            const resultDiv = document.getElementById('refundsResult');
+            resultDiv.innerHTML = '<div class="spinner-border spinner-border-sm me-2"></div>Loading refunds...';
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/refunds');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        <strong>Success!</strong> Found ${data.length} refunds
+                        <pre class="mt-2">${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        async function testCreateRefund() {
+            const resultDiv = document.getElementById('createResult');
+            resultDiv.innerHTML = '<div class="spinner-border spinner-border-sm me-2"></div>Creating test refund...';
+            
+            try {
+                const testRefund = {
+                    paymentId: 12345,
+                    refundAmount: 100.00,
+                    refundType: 'FULL_REFUND',
+                    refundReason: 'Test refund request',
+                    refundMethod: 'ORIGINAL_PAYMENT_METHOD'
+                };
+
+                const response = await fetch('http://localhost:8080/api/refunds', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testRefund)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-success">
+                            <strong>Success!</strong> Test refund created
+                            <pre class="mt-2">${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    const error = await response.json();
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-warning">
+                            <strong>Response:</strong> ${response.status} - ${error.message || 'Unknown error'}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-test on page load
+        window.onload = function() {
+            testGetRefunds();
+        };
+    </script>
+</body>
+</html>
+

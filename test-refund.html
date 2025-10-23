@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Refund System</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Refund System Test</h1>
+        
+        <div class="test-section">
+            <h2>1. Test Application Status</h2>
+            <button onclick="testApplication()">Test Application</button>
+            <div id="appStatus"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>2. Test Refund API (No Auth)</h2>
+            <button onclick="testRefundAPI()">Test Refund API</button>
+            <div id="apiStatus"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>3. Test Refund Pages</h2>
+            <button onclick="openRefundManagement()">Open Refund Management</button>
+            <button onclick="openRefundRequest()">Open Refund Request</button>
+            <div id="pageStatus"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>4. Test H2 Database Console</h2>
+            <button onclick="openH2Console()">Open H2 Console</button>
+            <div id="dbStatus"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>5. Create Test Data</h2>
+            <button onclick="createTestData()">Create Test Payment</button>
+            <div id="dataStatus"></div>
+        </div>
+    </div>
+
+    <script>
+        async function testApplication() {
+            const statusDiv = document.getElementById('appStatus');
+            try {
+                const response = await fetch('http://localhost:8080');
+                if (response.ok) {
+                    statusDiv.innerHTML = '<div class="success">✅ Application is running successfully!</div>';
+                } else {
+                    statusDiv.innerHTML = '<div class="error">❌ Application not responding</div>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="error">❌ Error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testRefundAPI() {
+            const statusDiv = document.getElementById('apiStatus');
+            try {
+                const response = await fetch('http://localhost:8080/api/refunds');
+                const data = await response.json();
+                if (response.ok) {
+                    statusDiv.innerHTML = '<div class="success">✅ Refund API is working! Response: ' + JSON.stringify(data) + '</div>';
+                } else {
+                    statusDiv.innerHTML = '<div class="error">❌ API Error: ' + response.status + '</div>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="error">❌ Error: ' + error.message + '</div>';
+            }
+        }
+
+        function openRefundManagement() {
+            window.open('http://localhost:8080/refund-management.html', '_blank');
+            document.getElementById('pageStatus').innerHTML = '<div class="info">ℹ️ Opening Refund Management page in new tab</div>';
+        }
+
+        function openRefundRequest() {
+            window.open('http://localhost:8080/refund-request.html', '_blank');
+            document.getElementById('pageStatus').innerHTML = '<div class="info">ℹ️ Opening Refund Request page in new tab</div>';
+        }
+
+        function openH2Console() {
+            window.open('http://localhost:8080/h2-console', '_blank');
+            document.getElementById('dbStatus').innerHTML = '<div class="info">ℹ️ Opening H2 Database Console in new tab</div>';
+        }
+
+        async function createTestData() {
+            const statusDiv = document.getElementById('dataStatus');
+            try {
+                // First, let's try to create a test payment
+                const paymentData = {
+                    bookingReference: "TEST001",
+                    paymentMethod: "CREDIT_CARD",
+                    amount: 100.00
+                };
+
+                const response = await fetch('http://localhost:8080/api/payments/room', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(paymentData)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    statusDiv.innerHTML = '<div class="success">✅ Test payment created! Payment ID: ' + result.paymentId + '</div>';
+                } else {
+                    const error = await response.json();
+                    statusDiv.innerHTML = '<div class="error">❌ Error creating test payment: ' + error.error + '</div>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="error">❌ Error: ' + error.message + '</div>';
+            }
+        }
+
+        // Auto-test on page load
+        window.onload = function() {
+            testApplication();
+            testRefundAPI();
+        };
+    </script>
+</body>
+</html>
+
